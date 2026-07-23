@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventMode {
+  RANDOM_SPLIT
+  FIXED_AMOUNT
+}
+
+// Mirrors LuckySplit.sol's EventState enum (LuckySplit_doc.md section 3).
+// No separate "Revealing" row: reveal() is atomic on-chain, so Committed
+// jumps straight to Distributing once the watcher calls it.
+enum EventState {
+  OPEN
+  FUNDED
+  COMMITTED
+  DISTRIBUTING
+  COMPLETED
+  CANCELLED
+}
+
+enum TxKind {
+  CREATE
+  FUND
+  COMMIT
+  REVEAL
+  DISTRIBUTE_BATCH
+  CANCEL
+  RETRY_REFUND
+}
+
+enum TxStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model Organizer {
+  id                  String   @id @default(uuid())
+  displayName         String
+  // The organizer's OWN external wallet (e.g. MetaMask), used only to sign a
+  // login challenge and prove a persistent identity -- doc section 2 still
+  // has no KYC/OAuth, this replaces "pick a name" with "prove you control an
+  // address" as the sole identity check. Never holds or moves event funds.
+  loginWalletAddress  String   @unique
+  // Bearer session token, rotated on every login. Only its hash is stored.
+  creatorTokenHash    String   @unique
+  // Separate wallet LuckySplit creates via Circle to custody event funds
+  // (doc section 7) -- distinct from loginWalletAddress above.
+  circleWalletId      String?
+  circleWalletAddress String?  @unique
+  createdAt           DateTime @default(now())
+  events              Event[]
+}
+
+model Event {
+  id                   String      @id @default(uuid())
+  contractEventId      Int?        @unique
+  organizerId          String
+  organizer            Organizer   @relation(fields: [organizerId], references: [id])
+  mode                 EventMode
+  numWallets           Int
+  numWinners           Int
+  // Amounts stored as decimal strings in 6-decimal USDC base units to avoid
+  // JS float precision loss -- parsed with viem's parseUnits/formatUnits.
+  fixedAmountPerWinner String?
+  totalDeposit         String?
+  state                EventState  @default(OPEN)
+  targetBlock          BigInt?
+  // Reveal secret, generated server-side, organizer never sees it (doc
+  // section 5). Only used internally by the watcher to call reveal() --
+  // never serialized in any public/organizer API response.
+  commitSecret         String?
+  createdAt            DateTime    @default(now())
+  fundedAt             DateTime?
+  committedAt          DateTime?
+  revealedAt            DateTime?
+  completedAt          DateTime?
+  wallets              WalletEntry[]
+  txs                  OnchainTx[]
+}
+
+model WalletEntry {
+  id       String  @id @default(uuid())
+  eventId  String
+  event    Event   @relation(fields: [eventId], references: [id])
+  address  String
+  isWinner Boolean @default(false)
+  amount   String?
+  paid     Boolean @default(false)
+  blocked  Boolean @default(false)
+
+  @@unique([eventId, address])
+  @@index([eventId])
+}
+
+model OnchainTx {
+  id          String   @id @default(uuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  kind        TxKind
+  txHash      String
+  blockNumber BigInt?
+  status      TxStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+
+  @@index([eventId])
+}

@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --surface: #12121b;
+  --surface-hover: #17171f;
+  --border: rgba(255, 255, 255, 0.08);
+  --foreground: #f4f4f7;
+  --muted: #8b8b9a;
+
+  --purple: #a855f7;
+  --violet: #8b5cf6;
+  --magenta: #d946ef;
+  --pink: #ec4899;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #f43f5e;
+
+  --gradient-primary: linear-gradient(135deg, var(--violet), var(--magenta));
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-purple: var(--purple);
+  --color-violet: var(--violet);
+  --color-magenta: var(--magenta);
+  --color-pink: var(--pink);
+  --color-blue: var(--blue);
+  --color-green: var(--green);
+  --color-red: var(--red);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.glass-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-btn {
+  background: var(--gradient-primary);
+  box-shadow: 0 0 24px -6px rgba(217, 70, 239, 0.55);
+}
+
+.gradient-btn:hover {
+  box-shadow: 0 0 32px -4px rgba(217, 70, 239, 0.75);
+}
+
+.glow-ring {
+  box-shadow: 0 0 40px -8px rgba(168, 85, 247, 0.45);
+}
+
+.neon-outline-btn {
+  border: 1px solid rgba(217, 70, 239, 0.6);
+  background: rgba(217, 70, 239, 0.06);
+  box-shadow:
+    0 0 10px -1px rgba(217, 70, 239, 0.65),
+    0 0 22px -4px rgba(139, 92, 246, 0.55),
+    inset 0 0 10px -6px rgba(217, 70, 239, 0.5);
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.neon-outline-btn:hover {
+  border-color: rgba(217, 70, 239, 0.95);
+  background: rgba(217, 70, 239, 0.12);
+  box-shadow:
+    0 0 16px -1px rgba(217, 70, 239, 0.85),
+    0 0 32px -4px rgba(139, 92, 246, 0.7),
+    inset 0 0 12px -6px rgba(217, 70, 239, 0.6);
+}
+
+/* Animated 7-color neon frame for the prize-pool amount input -- this is
+   real money moving into an event, so it gets the loudest treatment on the
+   page. Wrap an input/element in a div with this class. */
+.neon-rainbow-frame {
+  position: relative;
+  border-radius: 0.85rem;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    #ff3b3b,
+    #ff8a00,
+    #ffe600,
+    #3bff6e,
+    #00e5ff,
+    #3b82f6,
+    #d946ef,
+    #ff3b3b
+  );
+  background-size: 400% 100%;
+  animation: neon-rainbow-shift 6s linear infinite;
+  box-shadow:
+    0 0 18px -2px rgba(255, 255, 255, 0.35),
+    0 0 36px -6px rgba(217, 70, 239, 0.6);
+}
+
+.neon-rainbow-frame > * {
+  border-radius: calc(0.85rem - 2px);
+}
+
+@keyframes neon-rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}

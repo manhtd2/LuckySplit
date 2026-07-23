@@ -1,0 +1,18 @@
+# Compiler files
+cache/
+out/
+
+# Vendored deps (installed via --no-git, not submodules) -- re-fetch with
+# `forge install`, see README.md
+lib/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file
+.env

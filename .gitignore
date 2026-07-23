@@ -1,0 +1,10 @@
+# Local tooling config, not part of the project
+.claude/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Internal planning doc + design reference -- kept locally, not published
+LuckySplit_doc.md
+femau.png
